@@ -148,7 +148,7 @@ sub update_status {
     my $content = $res->{content};
     print STDERR "$content\n" if $ENV{DEBUG};
 
-    return 1 if $content =~ m/true/;
+    return $res if $content =~ m/true/;
     return;
 }
 
