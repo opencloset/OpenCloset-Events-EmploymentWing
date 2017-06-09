@@ -104,7 +104,8 @@ sub update_status {
 
 =head2 update_booking_datetime( $rent_num, $datetime )
 
-인증없이 사용할 수 있음
+    my $datetime = $order->booking->date;
+    my $success = $client->update_booking_datetime($rent_num, $datetime);
 
 =cut
 
@@ -112,6 +113,24 @@ sub update_booking_datetime {
     my ( $self, $rent_num, $datetime ) = @_;
     return unless $rent_num;
     return unless $datetime;
+
+    my $ymd = $datetime->ymd;
+    my $hms = $datetime->hms;
+    my $res = $self->{http}->post_form(
+        "$HOST/theopencloset/api_rentRcv.php",
+        {
+            rent_num  => $rent_num,
+            rent_date => $ymd,
+            rent_time => $hms,
+        }
+    );
+
+    unless ( $res->{success} ) {
+        warn "Failed call to update booking datetime: rent_num($rent_num), rent_date($ymd), rent_time($hms)";
+        return;
+    }
+
+    return $res;
 }
 
 1;
