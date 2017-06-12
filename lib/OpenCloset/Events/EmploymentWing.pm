@@ -122,6 +122,7 @@ sub update_booking_datetime {
             rent_num  => $rent_num,
             rent_date => $ymd,
             rent_time => $hms,
+            rcv_type  => 'm_date', # https://github.com/opencloset/opencloset/issues/1256
         }
     );
 
