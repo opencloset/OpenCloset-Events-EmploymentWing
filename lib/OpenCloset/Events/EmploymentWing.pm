@@ -8,9 +8,7 @@ require Exporter;
 use strict;
 use warnings;
 
-use HTTP::CookieJar;
 use HTTP::Tiny;
-use Path::Tiny;
 
 =encoding utf8
 
@@ -21,78 +19,30 @@ OpenCloset::Events::EmploymentWing - 취업날개 API(?) client
 =head1 SYNOPSIS
 
     use OpenCloset::Events::EmploymentWing;
-    my $client  = OpenCloset::Events::EmploymentWing->new( username => 'xxxx', password => 'xxxx' );
+    my $client  = OpenCloset::Events::EmploymentWing->new;
     my $success = $client->update_status($rent_num, $EW_STATUS_COMPLETE);
 
 =cut
 
-our $HOST = "http://dressfree.net";
+our $HOST = "https://dressfree.net";
 
 =head1 METHODS
 
-=head2 new( username => $username, password => $password )
+=head2 new
 
-    my $client = OpenCloset::Events::EmploymentWing->new(username => $username, password => $password);
-    die "login failed" unless $client;
+    my $client = OpenCloset::Events::EmploymentWing->new;
 
 =cut
 
 sub new {
     my ( $class, %args ) = @_;
-    return unless $args{username};
-    return unless $args{password};
 
     my $self = {
-        username => $args{username},
-        password => $args{password},
-        cookie   => $args{cookie} || "$ENV{HOME}/.opencloset.cookie.txt",
+        http => HTTP::Tiny->new(
+            timeout         => 5,
+            default_headers => { agent => __PACKAGE__ }
+        )
     };
-
-    my $cookie    = path( $self->{cookie} )->touch;
-    my $cookiejar = HTTP::CookieJar->new->load_cookies( $cookie->lines );
-    $self->{http} = HTTP::Tiny->new(
-        timeout         => 5,
-        cookie_jar      => $cookiejar,
-        default_headers => { agent => __PACKAGE__ }
-    );
-
-    my ($cookies) = $cookiejar->cookies_for($HOST);
-
-    ## `expires` 가 없음
-    ## 임의로 +10m 으로 설정
-    my $access_time = $cookies->{last_access_time};
-    if ( !$access_time || $access_time + 600 < time ) {
-        my $res = $self->{http}->post_form(
-            "$HOST/dev/login_ok.php",
-            {
-                cu_page => "$HOST/service/admin_1.php",
-                log_id  => $self->{username},
-                log_pwd => $self->{password}
-            }
-        );
-
-        my $content = $res->{content};
-        if ( $ENV{DEBUG} ) {
-            print STDERR "$res->{status} $res->{reason}\n";
-
-            while ( my ( $k, $v ) = each %{ $res->{headers} } ) {
-                for ( ref $v eq 'ARRAY' ? @$v : $v ) {
-                    print STDERR "$k: $_\n";
-                }
-            }
-
-            print STDERR "$content\n";
-        }
-
-        if ( $content =~ m{location\.replace\('http://dressfree\.net/service/admin_1\.php'\)} ) {
-            ## success
-            $cookie->spew( join "\n", $cookiejar->dump_cookies );
-        }
-        else {
-            ## fail
-            return;
-        }
-    }
 
     bless $self, $class;
     return $self;
@@ -148,8 +98,40 @@ sub update_status {
     my $content = $res->{content};
     print STDERR "$content\n" if $ENV{DEBUG};
 
-    return 1 if $content =~ m/true/;
+    return $res if $content =~ m/true/;
     return;
+}
+
+=head2 update_booking_datetime( $rent_num, $datetime )
+
+    my $datetime = $order->booking->date;
+    my $success = $client->update_booking_datetime($rent_num, $datetime);
+
+=cut
+
+sub update_booking_datetime {
+    my ( $self, $rent_num, $datetime ) = @_;
+    return unless $rent_num;
+    return unless $datetime;
+
+    my $ymd = $datetime->ymd;
+    my $hms = $datetime->hms;
+    my $res = $self->{http}->post_form(
+        "$HOST/theopencloset/api_rentRcv.php",
+        {
+            rent_num  => $rent_num,
+            rent_date => $ymd,
+            rent_time => $hms,
+            rcv_type  => 'm_date', # https://github.com/opencloset/opencloset/issues/1256
+        }
+    );
+
+    unless ( $res->{success} ) {
+        warn "Failed call to update booking datetime: rent_num($rent_num), rent_date($ymd), rent_time($hms)";
+        return;
+    }
+
+    return $res;
 }
 
 1;

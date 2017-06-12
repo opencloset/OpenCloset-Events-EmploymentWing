@@ -4,6 +4,14 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
 ## [Unreleased]
 
+## [v0.0.2] - Mon, 12 Jun 2017 13:50:44 +0900
+### Added
+- 예약일시 변경을 위한 `update_booking_datetime` 메소드 추가
+
+### Changed
+- 인증없이 API 를 호출
+- `update_status` 가 성공했을때의 return 값 변경
+
 ## [v0.0.1] - Mon, 05 Jun 2017 12:31:55 +0900
 ### Added
 - 대여넘버(rent_num)로 취업날개 서비스의 온라인 상태를 변경하는 기능 추가
