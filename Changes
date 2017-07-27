@@ -4,6 +4,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
 ## [Unreleased]
 
+## [v0.0.3] - Thu, 27 Jul 2017 18:01:38 +0900
+
 ### Added
 - 연장하기(extend_period) 기능 추가
 
