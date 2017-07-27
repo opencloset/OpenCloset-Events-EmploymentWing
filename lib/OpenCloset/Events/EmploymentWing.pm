@@ -8,7 +8,10 @@ require Exporter;
 use strict;
 use warnings;
 
+use Encode qw/decode_utf8/;
+use HTTP::CookieJar;
 use HTTP::Tiny;
+use Mojo::DOM;
 
 =encoding utf8
 
@@ -40,7 +43,10 @@ sub new {
     my $self = {
         http => HTTP::Tiny->new(
             timeout         => 5,
-            default_headers => { agent => __PACKAGE__ }
+            default_headers => { agent => __PACKAGE__ },
+            cookie_jar      => HTTP::CookieJar->new,
+            username        => $args{username} || '',
+            password        => $args{password} || '',
         )
     };
 
@@ -137,6 +143,62 @@ sub update_booking_datetime {
     }
 
     return $res;
+}
+
+=head2 extend_period( $rent_num, $n, $desc )
+
+    my $success = $client->extend_period($rent_num, 2, '대여기간 +6d');
+
+=cut
+
+sub extend_period {
+    my ( $self, $rent_num, $n, $desc ) = @_;
+    return unless $n;
+    return unless $desc;
+
+    $self->_auth;
+
+    my $res     = $self->{http}->get("http://dressfree.net/service/admin_3_v.php?rent_num=$rent_num");
+    my $content = decode_utf8( $res->{content} );
+    print STDERR "$content\n" if $ENV{DEBUG};
+
+    my %params = ( p_history => $desc );
+    my $dom = Mojo::DOM->new($content);
+    for my $input ( $dom->find('form[name="onlineForm"] input')->each ) {
+        $params{ $input->{name} } = $input->{value};
+    }
+
+    for ( 1 .. $n ) {
+        my $res = $self->{http}->post_form( "http://dressfree.net/dev/penalty_ok.php", \%params );
+        my $content = $res->{content};
+        print STDERR "$content\n" if $ENV{DEBUG};
+    }
+
+    return 1; # 결과는 알 수 없다.
+}
+
+=head2 _auth
+
+=cut
+
+sub _auth {
+    my $self = shift;
+    return unless $self->{username};
+    return unless $self->{password};
+
+    my $res = $self->{http}->post_form(
+        "$HOST/dev/login_ok.php",
+        {
+            log_id  => $self->{username},
+            log_pwd => $self->{password},
+        }
+    );
+
+    my $content = $res->{content};
+    print STDERR "$content\n" if $ENV{DEBUG};
+
+    return $res if $content =~ m/main\.php/;
+    return;
 }
 
 1;

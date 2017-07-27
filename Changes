@@ -4,6 +4,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
 ## [Unreleased]
 
+### Added
+- 연장하기(extend_period) 기능 추가
+
 ### Changed
 - 배송희망일 변경가능 (#1)
 
