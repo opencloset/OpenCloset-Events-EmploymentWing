@@ -41,12 +41,12 @@ sub new {
     my ( $class, %args ) = @_;
 
     my $self = {
-        http => HTTP::Tiny->new(
+        username => $args{username} || '',
+        password => $args{password} || '',
+        http     => HTTP::Tiny->new(
             timeout         => 5,
             default_headers => { agent => __PACKAGE__ },
             cookie_jar      => HTTP::CookieJar->new,
-            username        => $args{username} || '',
-            password        => $args{password} || '',
         )
     };
 
@@ -160,7 +160,7 @@ sub extend_period {
 
     my $res     = $self->{http}->get("http://dressfree.net/service/admin_3_v.php?rent_num=$rent_num");
     my $content = decode_utf8( $res->{content} );
-    print STDERR "$content\n" if $ENV{DEBUG};
+    warn "$content\n" if $ENV{DEBUG};
 
     my %params = ( p_history => $desc );
     my $dom = Mojo::DOM->new($content);
@@ -171,7 +171,7 @@ sub extend_period {
     for ( 1 .. $n ) {
         my $res = $self->{http}->post_form( "http://dressfree.net/dev/penalty_ok.php", \%params );
         my $content = $res->{content};
-        print STDERR "$content\n" if $ENV{DEBUG};
+        warn "$content\n" if $ENV{DEBUG};
     }
 
     return 1; # 결과는 알 수 없다.
@@ -195,7 +195,7 @@ sub _auth {
     );
 
     my $content = $res->{content};
-    print STDERR "$content\n" if $ENV{DEBUG};
+    warn "$content\n" if $ENV{DEBUG};
 
     return $res if $content =~ m/main\.php/;
     return;

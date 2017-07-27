@@ -4,6 +4,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
 ## [Unreleased]
 
+### Fixed
+- Constructor typo
+
 ## [v0.0.3] - Thu, 27 Jul 2017 18:01:38 +0900
 
 ### Added
