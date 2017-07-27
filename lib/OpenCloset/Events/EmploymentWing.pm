@@ -102,7 +102,7 @@ sub update_status {
     return;
 }
 
-=head2 update_booking_datetime( $rent_num, $datetime )
+=head2 update_booking_datetime( $rent_num, $datetime, $online? )
 
     my $datetime = $order->booking->date;
     my $success = $client->update_booking_datetime($rent_num, $datetime);
@@ -110,20 +110,25 @@ sub update_status {
 =cut
 
 sub update_booking_datetime {
-    my ( $self, $rent_num, $datetime ) = @_;
+    my ( $self, $rent_num, $datetime, $online ) = @_;
     return unless $rent_num;
     return unless $datetime;
 
     my $ymd = $datetime->ymd;
     my $hms = $datetime->hms;
+    ## https://github.com/opencloset/opencloset/issues/1256
+    my $params = { rent_num => $rent_num, rcv_type => 'm_date' };
+    if ($online) {
+        $params->{deli_date} = $ymd;
+    }
+    else {
+        $params->{rent_date} = $ymd;
+        $params->{rent_time} = $hms;
+    }
+
     my $res = $self->{http}->post_form(
         "$HOST/theopencloset/api_rentRcv.php",
-        {
-            rent_num  => $rent_num,
-            rent_date => $ymd,
-            rent_time => $hms,
-            rcv_type  => 'm_date', # https://github.com/opencloset/opencloset/issues/1256
-        }
+        $params
     );
 
     unless ( $res->{success} ) {

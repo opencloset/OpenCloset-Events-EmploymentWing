@@ -4,6 +4,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
 ## [Unreleased]
 
+### Changed
+- 배송희망일 변경가능 (#1)
+
 ## [v0.0.2] - Mon, 12 Jun 2017 13:50:44 +0900
 ### Added
 - 예약일시 변경을 위한 `update_booking_datetime` 메소드 추가
