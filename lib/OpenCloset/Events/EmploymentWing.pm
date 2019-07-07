@@ -101,6 +101,20 @@ sub update_status {
         }
     );
 
+    ## https://github.com/opencloset/opencloset/issues/1584
+    ## redirect fallback
+    if ($res->{status} == 302 and $res->{headers}{location}) {
+        my $url = $res->{headers}{location};
+        $res = $self->{http}->post_form(
+            $url,
+            {
+                uptype => 'online_state',
+                val1   => $rent_num,
+                val2   => $status,
+            }
+        );
+    }
+
     my $content = $res->{content};
     print STDERR "$content\n" if $ENV{DEBUG};
 

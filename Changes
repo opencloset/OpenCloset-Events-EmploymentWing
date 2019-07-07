@@ -4,6 +4,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
 ## [Unreleased]
 
+### Added
+- 상태변경 API redirect 응답에 대한 fallback (https://github.com/opencloset/opencloset/issues/1584)
+
 ## [v0.1.0] - Thu, 22 Feb 2018 12:37:09 +0900
 
 ### Changed
