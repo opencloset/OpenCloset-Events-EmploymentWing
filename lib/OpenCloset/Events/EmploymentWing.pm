@@ -27,7 +27,7 @@ OpenCloset::Events::EmploymentWing - 취업날개 API(?) client
 
 =cut
 
-our $HOST = "https://dressfree.net";
+our $HOST = "http://dressfree.net";
 
 =head1 METHODS
 
