@@ -4,6 +4,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
 ## [Unreleased]
 
+## [v0.1.2] - Tue, 09 Jul 2019 20:15:57 +0900
+
 ### Chaned
 - 인증서 만료로 인해 API URL scheme 을 http 로 변경 (#1585)
 
