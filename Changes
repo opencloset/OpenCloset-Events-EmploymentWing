@@ -4,6 +4,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
 ## [Unreleased]
 
+### Chaned
+- 인증서 만료로 인해 API URL scheme 을 http 로 변경 (#1585)
+
+## [v0.1.1]
+
 ### Added
 - 상태변경 API redirect 응답에 대한 fallback (https://github.com/opencloset/opencloset/issues/1584)
 
