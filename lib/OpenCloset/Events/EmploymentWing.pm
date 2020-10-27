@@ -27,7 +27,7 @@ OpenCloset::Events::EmploymentWing - 취업날개 API(?) client
 
 =cut
 
-our $HOST = "http://dressfree.net";
+our $HOST = "https://www.dressfree.net";
 
 =head1 METHODS
 
@@ -178,7 +178,7 @@ sub extend_period {
 
     $self->_auth;
 
-    my $res     = $self->{http}->get("http://dressfree.net/service/admin_3_v.php?rent_num=$rent_num");
+    my $res     = $self->{http}->get("$HOST/service/admin_3_v.php?rent_num=$rent_num");
     my $content = decode_utf8( $res->{content} );
     warn "$content\n" if $ENV{DEBUG};
 
@@ -189,7 +189,7 @@ sub extend_period {
     }
 
     for ( 1 .. $n ) {
-        my $res = $self->{http}->post_form( "http://dressfree.net/dev/penalty_ok.php", \%params );
+        my $res = $self->{http}->post_form( "$HOST/dev/penalty_ok.php", \%params );
         my $content = $res->{content};
         warn "$content\n" if $ENV{DEBUG};
     }
