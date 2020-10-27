@@ -3,6 +3,7 @@
 The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
 ## [Unreleased]
+## [v0.1.3] - Tue, 27 Oct 2020 22:15:10 +0900
 ### Changed
 - dressfree.net 의 domain 이 dressfree.net 에서 www.dressfree.net 으로 변경됨
 - http protocol 에서 https 로 변경됨
